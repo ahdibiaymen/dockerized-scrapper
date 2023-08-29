@@ -38,14 +38,14 @@ class DefaultConfig:
     INITIAL_PAGE_LOAD_TIME_MIN = 5
     INITIAL_PAGE_LOAD_TIME_MAX = 15
     # ROUND-ROBIN PROXY
-    PROXY_HOST = os.environ["PROXY_HOST"]
-    PROXY_USERNAME = os.environ["PROXY_USERNAME"]
-    PROXY_PASSWORD = os.environ["PROXY_PASSWORD"]
+    PROXY_HOST = os.environ.get("PROXY_HOST")
+    PROXY_USERNAME = os.environ.get("PROXY_USERNAME")
+    PROXY_PASSWORD = os.environ.get("PROXY_PASSWORD")
 
     # web drivers executable PATHS
     # automatically assigned before the first request
-    FIREFOX_EXECUTABLE_PATH = os.environ["FIREFOX_EXECUTABLE_PATH"]
-    CHROME_EXECUTABLE_PATH = os.environ["CHROME_EXECUTABLE_PATH"]
+    FIREFOX_EXECUTABLE_PATH = os.environ.get("FIREFOX_EXECUTABLE_PATH")
+    CHROME_EXECUTABLE_PATH = os.environ.get("CHROME_EXECUTABLE_PATH")
 
     @staticmethod
     def init_loggers():

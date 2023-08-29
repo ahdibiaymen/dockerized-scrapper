@@ -24,3 +24,7 @@ def create_app():
     register_endpoints_routes(apix)
 
     return app
+
+
+if __name__ == "__main__":
+    create_app().run()
