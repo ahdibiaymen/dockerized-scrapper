@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: "website_snapshot_fetcher"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./.env
+    ports:
+      - 8000:8000
+      - 5000:5000
+    networks: [ host ]
+    entrypoint: [ "/docker-entrypoint.sh" ]
