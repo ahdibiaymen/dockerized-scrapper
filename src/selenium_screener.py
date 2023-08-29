@@ -28,7 +28,7 @@ class Selenium:
         enable_proxy=False,
     ):
         self.__exit_timeout = current_app.config["BROWSER_EXIT_TIMEOUT"]
-        self.__OCD_PROXY = current_app.config.get("PROXY_HOST", None)
+        self.__PROXY = current_app.config.get("PROXY_HOST", None)
         self.__username = current_app.config.get("PROXY_USERNAME", None)
         self.__password = current_app.config.get("PROXY_PASSWORD", None)
 
@@ -47,26 +47,10 @@ class Selenium:
         )
 
     def __get_ocd_proxy(self):
-        if not any([self.__username, self.__password, self.__OCD_PROXY]):
-            raise ValueError(
-                "The scrapper require proxy config to use it in proxy mode"
-            )
-        http = (
-            "http://"
-            + self.__username
-            + ":"
-            + self.__password
-            + "@"
-            + self.__OCD_PROXY
-        )
-        https = (
-            "https://"
-            + self.__username
-            + ":"
-            + self.__password
-            + "@"
-            + self.__OCD_PROXY
-        )
+        if not any([self.__username, self.__password, self.__PROXY]):
+            raise ValueError("The scrapper require proxy config to use it in proxy mode")
+        http = "http://" + self.__username + ":" + self.__password + "@" + self.__PROXY
+        https = "https://" + self.__username + ":" + self.__password + "@" + self.__PROXY
         no_proxy = "localhost,127.0.0.1,dev_server:8080"
         proxy_options = {
             "proxy": {
@@ -153,9 +137,7 @@ class Selenium:
         try:
             return_code = self.driver.process.poll()
         except WebDriverException as e:
-            logger.warning(
-                f"Driver is not running due to the following exception : {e}"
-            )
+            logger.warning(f"Driver is not running due to the following exception : {e}")
             return False
         else:
             return return_code is None
@@ -168,9 +150,7 @@ class Selenium:
         png_path=None,
     ):
         if not all((html_path, png_path)):
-            raise ValueError(
-                "HTML and PNG paths are required for the scrapper !"
-            )
+            raise ValueError("HTML and PNG paths are required for the scrapper !")
 
         self.driver.get(url)
 
@@ -179,18 +159,12 @@ class Selenium:
                 current_app.config["INITIAL_PAGE_LOAD_TIME_MIN"],
                 current_app.config["INITIAL_PAGE_LOAD_TIME_MAX"],
             )
-            logger.info(
-                f"initial wait of {loading_time} seconds for page loading ...."
-            )
+            logger.info(f"initial wait of {loading_time} seconds for page loading ....")
             time.sleep(loading_time)
 
         # TIMEOUT TO EXIT THE PAGE
         wait = WebDriverWait(self.driver, self.__exit_timeout)
-        wait.until(
-            expected_conditions.visibility_of_element_located(
-                (By.TAG_NAME, "body")
-            )
-        )
+        wait.until(expected_conditions.visibility_of_element_located((By.TAG_NAME, "body")))
 
         # accept any alert
         try:
@@ -206,9 +180,7 @@ class Selenium:
                 fd.close()
 
             # SCREENSHOT
-            S = lambda X: self.driver.execute_script(
-                "return document.body.parentNode.scroll" + X
-            )
+            S = lambda X: self.driver.execute_script("return document.body.parentNode.scroll" + X)
             self.driver.set_window_size(S("Width"), S("Height"))
             body = self.driver.find_element(By.TAG_NAME, "body")
 

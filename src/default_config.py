@@ -15,8 +15,6 @@ class DefaultConfig:
 
     PREFIX_PATH = "/{}".format(os.environ["DEPLOYMENT_VERSION"])
 
-    SCRAPPER_API_KEY = os.environ["SCRAPPER_API_KEY"]
-
     PROPAGATE_EXCEPTIONS = True
 
     INSTANCE_PATH = os.environ["INSTANCE_PATH"]
@@ -57,8 +55,7 @@ class DefaultConfig:
             "formatters": {
                 "verbose": {
                     "format": (
-                        "%(levelname)s -- %(asctime)s --"
-                        " %(pathname)s:%(lineno)d >  %(message)s "
+                        "%(levelname)s -- %(asctime)s -- %(pathname)s:%(lineno)d >  %(message)s "
                     ),
                     "datefmt": "%Y-%m-%d %H:%M:%S",
                 },
