@@ -1,0 +1,68 @@
+name: CI-Python
+
+on:
+  push:
+    branches: [ "main","develop","release/**","feature/**" ]
+  pull_request:
+    branches: [ "main","develop","release/**","feature/**" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: ubuntu
+    services:
+      # Label used to access the service container
+      postgres-db:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: postgres
+          POSTGRES_DB: tor_ip
+        options:
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4.7.0
+        with:
+          python-version: "3.9"
+      - name: Install dependencies
+        run: |
+          apt-get update -y
+          apt-get install build-essential python3-dev -y
+          python -m pip install --upgrade pip
+          pip install gunicorn
+          pip install flake8 pytest black isort
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Python Isort
+        run: |
+          isort --profile black --line-length 90 .
+
+      - name: Python Black
+        run: |
+          black --line-length=90 --preview .
+
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics --extend-exclude=tests/* --ignore=E712,W503
+          # exit-zero treats all errors as warnings. The GitHub editor is 90 chars wide
+          flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=90 --statistics --ignore=E712,W503
+
+      - name: Test with pytest
+        run: |
+          pytest
+        env:
+          POSTGRESQL_DB_PASSWD: test_password
+          POSTGRESQL_DB_USER: postgres
+          POSTGRESQL_DB_HOST: postgres-db
+          POSTGRESQL_DB_PORT: 5432
+          POSTGRESQL_DB_NAME: tor_ip
